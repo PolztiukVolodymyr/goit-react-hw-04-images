@@ -23,9 +23,12 @@ export function App () {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (!searchName) return;
+    if (!searchName) {
+        return
+    };
     setLoading(true);
     setVisible(false);
+    
     searchImage(searchName, page).then(data => {
       
     const images = data.hits.map(({ id, tags, webformatURL, largeImageURL }) => (
@@ -66,8 +69,7 @@ export function App () {
     setPage(state => state + 1);
   }
 
- 
-    return (
+     return (
     
       <div className={css.Container}>
         <Searchbar onSubmit={hendleSubmit} />
