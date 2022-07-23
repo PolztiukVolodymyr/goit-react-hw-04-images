@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import { useState, useEffect } from "react";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -11,87 +11,77 @@ import searchImage from "../../services/Api";
 import Loader from "../Loader/Loader";
 
 
-export class App extends Component{
+export function App () {
 
-  state = {
-    searchName: "",
-    page: 1,
-    showModal: false,
-    loading: false,
-    images: [],
-    largeImageURL: "",
-    alt: "",
-    visible: false,
-    };
+  const [searchName, setSearchName] = useState("");
+  const [page, setPage] = useState(1);
+  const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [images, setImages] = useState([]);
+  const [largeImageURL, setLargeImageURL] = useState("");
+  const [alt, setAlt] = useState("");
+  const [visible, setVisible] = useState(false);
 
-  async componentDidUpdate(prevProps, prevState) {
-    const { searchName, page } = this.state;
-     try{    if (prevState.searchName !== searchName) {
-        this.setState({ loading: true, images: [], page: 1, visible: false })
-    }
-       
-    if (searchName !== prevState.searchName || page !== prevState.page) {
-         const response = await searchImage(searchName, page)
-         const images = response.hits.map(({ id, tags, webformatURL, largeImageURL }) => (
-       { id, tags, webformatURL, largeImageURL }));
-    
-
-     if (images.length > 0) {
-       this.setState({ visible: true })
-        toast.success("We have found something for you!");
-     } else {
-      toast.warning("We haven't found anything on your request");
-       this.setState({ visible: false })
-     }
-    
-      this.setState((state) => ({ images: [...state.images, ...images], loading: false }));
+  useEffect(() => {
+    if (!searchName) return;
+    setLoading(true);
+    setVisible(false);
+    searchImage(searchName, page).then(data => {
       
-       }
-     } catch (eror) {
-       console.log(eror.message);
-     }
- 
+    const images = data.hits.map(({ id, tags, webformatURL, largeImageURL }) => (
+      { id, tags, webformatURL, largeImageURL }));
+     
+       if (images.length > 0) {
+             setVisible(true);
+              toast.success("We have found something for you!");
+      } else {
+               toast.warning("We haven't found anything on your request");
+             setVisible(false);
+      }
+      setImages(state => [...state, ...images]);
+      setLoading(false)
+    }).catch(error => console.log(error.message))
+        
+    },[searchName, page])
+
+
+  const hendleSubmit = evt => {
+    setPage(1);
+    setImages([]);
+    setSearchName(evt);
   }
 
-  hendleSubmit = evt => {
-    this.setState({ page: 1 });
-    this.setState({ searchName: evt });
+  const togleModal = () => {
+    setShowModal(show => !show);
   }
 
-  togleModal = () => {
-    this.setState(({showModal}) => ({
-      showModal: !showModal
-    }))
-  }
-
-  onImgClick = (largeImageURL, alt) => {
-    this.setState({ largeImageURL, alt });
-    this.togleModal();
+  const onImgClick = (largeImageURL, alt) => {
+    setLargeImageURL(largeImageURL);
+    setAlt(alt);
+    togleModal();
     
   }
 
-  onLoadMore = () => {
-    this.setState(state => ({ page: state.page + 1 }));
+  const onLoadMore = () => {
+    setPage(state => state + 1);
   }
 
-  render() {
-    const { showModal, images, largeImageURL, alt, visible, loading} = this.state;
-  
+ 
     return (
     
       <div className={css.Container}>
-        <Searchbar onSubmit={this.hendleSubmit} />
+        <Searchbar onSubmit={hendleSubmit} />
         {loading && <Loader/>}
-        <ImageGallery images={images} onClick={this.onImgClick} />
+        <ImageGallery images={images} onClick={onImgClick} />
        
-        {showModal && <Modal onClose={this.togleModal}>
+        {showModal && <Modal onClose={togleModal}>
           <img src={largeImageURL} alt={alt}/>
            {/* <button type="button" onClick={this.togleModal}>Close Modal</button> */}
         </Modal>}
-        {visible && <Button onClick={this.onLoadMore}/>}
+        {visible && <Button onClick={onLoadMore}/>}
         
         <ToastContainer type="error" theme="colored" autoClose={3000}/>
     </div>
   )
-}
+
 }
