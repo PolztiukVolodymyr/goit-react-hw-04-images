@@ -33,16 +33,24 @@ export function App () {
       
     const images = data.hits.map(({ id, tags, webformatURL, largeImageURL }) => (
       { id, tags, webformatURL, largeImageURL }));
+
+       if (images.length > 0) {
+           toast.success("We have found something for you!");
+       } else {
+            toast.warning("We haven't found anything on your request");
+      }
      
        if (images.length > 11) {
              setVisible(true);
-              toast.success("We have found something for you!");
+              
       } else {
-               toast.warning("We haven't found anything on your request");
+          
              setVisible(false);
       }
+    
       setImages(state => [...state, ...images]);
       setLoading(false)
+   
     }).catch(error => console.log(error.message))
         
     },[searchName, page])
