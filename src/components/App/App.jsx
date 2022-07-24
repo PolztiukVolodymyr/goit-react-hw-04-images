@@ -34,20 +34,14 @@ export function App () {
     const images = data.hits.map(({ id, tags, webformatURL, largeImageURL }) => (
       { id, tags, webformatURL, largeImageURL }));
 
-       if (images.length > 0) {
-           toast.success("We have found something for you!");
-       } else {
-            toast.warning("We haven't found anything on your request");
-      }
+      images.length > 0
+        ? toast.success("We have found something for you!")
+        : toast.warning("We haven't found anything on your request");
      
-       if (images.length > 11) {
-             setVisible(true);
-              
-      } else {
-          
-             setVisible(false);
-      }
-    
+     
+      images.length > 11 ? setVisible(true) : setVisible(false);
+             
+       
       setImages(state => [...state, ...images]);
       setLoading(false)
    
