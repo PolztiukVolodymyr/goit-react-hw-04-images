@@ -34,7 +34,7 @@ export function App () {
     const images = data.hits.map(({ id, tags, webformatURL, largeImageURL }) => (
       { id, tags, webformatURL, largeImageURL }));
      
-       if (images.length > 0) {
+       if (images.length > 11) {
              setVisible(true);
               toast.success("We have found something for you!");
       } else {
@@ -73,13 +73,13 @@ export function App () {
     
       <div className={css.Container}>
         <Searchbar onSubmit={hendleSubmit} />
-        {loading && <Loader/>}
         <ImageGallery images={images} onClick={onImgClick} />
        
         {showModal && <Modal onClose={togleModal}>
           <img src={largeImageURL} alt={alt}/>
            {/* <button type="button" onClick={this.togleModal}>Close Modal</button> */}
-        </Modal>}
+         </Modal>}
+         {loading && <Loader/>}
         {visible && <Button onClick={onLoadMore}/>}
         
         <ToastContainer type="error" theme="colored" autoClose={3000}/>
